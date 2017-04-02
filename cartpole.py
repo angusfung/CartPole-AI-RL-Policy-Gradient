@@ -88,10 +88,13 @@ sess.run(tf.global_variables_initializer())
 MEMORY=25
 MAX_STEPS = env.spec.tags.get('wrapper_config.TimeLimit.max_episode_steps')
 
+#for plotting
 steps = []
-
+average_steps = []
 track_returns = []
-for ep in range(5000):
+track_steps = []
+
+for ep in range(4000):
 
     obs = env.reset()
 
@@ -129,21 +132,31 @@ for ep in range(5000):
     track_returns.append(G)
     track_returns = track_returns[-MEMORY:]
     mean_return = np.mean(track_returns)
-    print("Episode {} finished after {} steps with return {}".format(ep, t, G))
-    print("Mean return over the last {} episodes is {}".format(MEMORY,
-                                                               mean_return))
+    
+    track_steps.append(t)
+    track_steps = track_steps[-MEMORY:]
+    mean_steps = np.mean(track_steps)
+    average_steps.append(mean_steps)
+    
+    if ep % 100 == 0:
+        
+        print("Episode {} finished after {} steps with return {}".format(ep, t, G))
+        #print("Mean return over the last {} episodes is {}".format(MEMORY,
+                                                                #mean_return))
 
-
-    # with tf.variable_scope("mus", reuse=True):
-    #     print("incoming weights for the mu's from the first hidden unit:", sess.run(tf.get_variable("weights"))[0,:])
+        print("Average number of steps over the last {} episode is {}".format(MEMORY, mean_steps))
+        with tf.variable_scope("hidden", reuse=True):
+            print("incoming weights:", sess.run(tf.get_variable("weights")))
 
 
 sess.close()
-tot_epis = 5000
+tot_epis = 4000
 x_axis = linspace(0, tot_epis, len(steps))
-plt_steps = plt.plot(x_axis, steps)
+plt_steps = plt.plot(x_axis, steps, label = 'Steps')
+plt_steps = plt.plot(x_axis, average_steps, label = 'Mean Steps')
 plt.xlabel('Episode Number')
 plt.ylabel('Number of Steps')
 plt.title('Performance')
+plt.legend(["Steps", "Mean Steps"], loc=7)
 plt.show()
 plt.savefig("cartpole.png")
