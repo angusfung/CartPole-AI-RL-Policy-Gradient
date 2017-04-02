@@ -85,7 +85,7 @@ train_op = optimizer.minimize(-1.0 * Returns * log_pi)
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
-MEMORY=5
+MEMORY=25
 MAX_STEPS = env.spec.tags.get('wrapper_config.TimeLimit.max_episode_steps')
 
 steps = []
