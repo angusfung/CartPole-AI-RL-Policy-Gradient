@@ -93,6 +93,10 @@ steps = []
 average_steps = []
 track_returns = []
 track_steps = []
+weight1 = []
+weight2 = []
+weight3 = []
+weight4 = []
 
 for ep in range(4000):
 
@@ -138,6 +142,13 @@ for ep in range(4000):
     mean_steps = np.mean(track_steps)
     average_steps.append(mean_steps)
     
+    with tf.variable_scope("hidden", reuse=True):
+        weights = sess.run(tf.get_variable("weights")[:,0])
+        weight1.append(weights[0])
+        weight2.append(weights[1])
+        weight3.append(weights[2])
+        weight4.append(weights[3])
+    
     if ep % 100 == 0:
         
         print("Episode {} finished after {} steps with return {}".format(ep, t, G))
@@ -146,10 +157,12 @@ for ep in range(4000):
 
         print("Average number of steps over the last {} episode is {}".format(MEMORY, mean_steps))
         with tf.variable_scope("hidden", reuse=True):
-            print("incoming weights:", sess.run(tf.get_variable("weights")))
+            print("incoming weights:", sess.run(tf.get_variable("weights")[:,0]))
 
 
 sess.close()
+
+#Plot Performance
 tot_epis = 4000
 x_axis = linspace(0, tot_epis, len(steps))
 plt_steps = plt.plot(x_axis, steps, label = 'Steps')
@@ -158,5 +171,28 @@ plt.xlabel('Episode Number')
 plt.ylabel('Number of Steps')
 plt.title('Performance')
 plt.legend(["Steps", "Mean Steps"], loc=7)
-plt.show()
 plt.savefig("cartpole.png")
+f1 = plt.figure() #needed to display on different windows
+#plt.show()
+
+
+#Plot Weights
+x_axis = linspace(0, tot_epis, len(steps))
+plt_steps = plt.plot(x_axis, weight1, label = 'Weight 1')
+plt_steps = plt.plot(x_axis, weight2, label = 'Weight 2')
+plt_steps = plt.plot(x_axis, weight3, label = 'Weight 3')
+plt_steps = plt.plot(x_axis, weight4, label = 'Weight 4')
+
+plt.xlabel('Episode Number')
+plt.ylabel('Weights')
+plt.title('Weights vs. Episode Number')
+plt.legend(['Weight 1', 'Weight 2', 'Weight 3', 'Weight 4'], loc=7)
+plt.savefig("cartpole_weights.png")
+f2 = plt.figure() #needed to display on different windows
+
+
+plt.show()
+
+
+
+
